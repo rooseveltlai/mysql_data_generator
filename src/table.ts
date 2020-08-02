@@ -67,11 +67,12 @@ export class TableService {
         let previousRunRows: number = -1;
 
         let currentNbRows: number = await this.dbConnector.countLines(table);
-        batch: while (currentNbRows < table.lines) {
+        let target = currentNbRows + tables.lines
+        batch: while (currentNbRows < target) {
             previousRunRows = currentNbRows;
 
             const rows = [];
-            const runRows = Math.min(1000, table.lines - currentNbRows);
+            const runRows = Math.min(1000, target - currentNbRows);
 
             try {
                 await this.getForeignKeyValues(table, tableForeignKeyValues, runRows);
@@ -199,7 +200,7 @@ export class TableService {
                 console.warn(`Last run didn't insert any new rows in ${table.name}`);
                 break batch;
             }
-            console.log(currentNbRows + ' / ' + table.lines);
+            console.log(currentNbRows + ' / ' + target);
         }
     }
 
